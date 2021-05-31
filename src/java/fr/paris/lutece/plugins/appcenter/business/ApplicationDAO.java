@@ -48,435 +48,482 @@ import java.util.Map;
  */
 public final class ApplicationDAO implements IApplicationDAO
 {
-    // Constants
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id_application ) FROM appcenter_application";
-    private static final String SQL_QUERY_SELECT = "SELECT appcenter_application.id_application, name, description, id_organization_manager, application_data,code, environment_code FROM appcenter_application LEFT JOIN appcenter_application_environment ON appcenter_application.id_application = appcenter_application_environment.id_application WHERE appcenter_application.id_application = ? ";
-    private static final String SQL_QUERY_SELECT_BY_CODE = "SELECT appcenter_application.id_application, name, description, id_organization_manager, application_data,code, environment_code FROM appcenter_application LEFT JOIN appcenter_application_environment ON appcenter_application.id_application = appcenter_application_environment.id_application WHERE appcenter_application.code = ? ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO appcenter_application ( id_application, name, description, id_organization_manager, application_data,code ) VALUES ( ?, ?, ?, ?, ? , ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM appcenter_application WHERE id_application = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE appcenter_application SET name = ?, description = ? , id_organization_manager = ?, code = ?  WHERE id_application = ?";
-    private static final String SQL_QUERY_UPDATE_DATA = "UPDATE appcenter_application SET application_data = ? WHERE id_application = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_application, name, description, id_organization_manager, application_data, code FROM appcenter_application";
-    private static final String SQL_QUERY_DELETE_AUTHORIZED = "DELETE FROM appcenter_user_application_role WHERE id_application = ? ";
-    private static final String SQL_QUERY_SELECT_USER_ROLE = "SELECT id_role FROM appcenter_user_application_role WHERE id_application = ? AND id_user = ? ";
-    private static final String SQL_QUERY_INSERT_ENVIRONMENT = " INSERT INTO appcenter_application_environment ( id_application, environment_code ) VALUES ( ? , ? ) ";
-    private static final String SQL_QUERY_DELETE_ENVIRONMENT = " DELETE FROM appcenter_application_environment WHERE id_application = ? ";
+	// Constants
+	private static final String SQL_QUERY_NEW_PK = "SELECT max( id_application ) FROM appcenter_application";
+	private static final String SQL_QUERY_SELECT = "SELECT appcenter_application.id_application, name, description, id_organization_manager, application_data, logo_path, front_url, back_url, code, environment_code FROM appcenter_application LEFT JOIN appcenter_application_environment ON appcenter_application.id_application = appcenter_application_environment.id_application WHERE appcenter_application.id_application = ? ";
+	private static final String SQL_QUERY_SELECT_BY_CODE = "SELECT appcenter_application.id_application, name, description, id_organization_manager, application_data,code, environment_code, logo_path, front_url, back_url FROM appcenter_application LEFT JOIN appcenter_application_environment ON appcenter_application.id_application = appcenter_application_environment.id_application WHERE appcenter_application.code = ? ";
+	private static final String SQL_QUERY_INSERT = "INSERT INTO appcenter_application ( id_application, name, description, id_organization_manager, application_data,code, logo_path, front_url, back_url ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+	private static final String SQL_QUERY_DELETE = "DELETE FROM appcenter_application WHERE id_application = ? ";
+	private static final String SQL_QUERY_UPDATE = "UPDATE appcenter_application SET name = ?, description = ? , id_organization_manager = ?, code = ?, logo_path = ?, front_url = ?, back_url = ?  WHERE id_application = ?";
+	private static final String SQL_QUERY_UPDATE_DATA = "UPDATE appcenter_application SET application_data = ? WHERE id_application = ?";
+	private static final String SQL_QUERY_SELECTALL = "SELECT id_application, name, description, id_organization_manager, application_data, code, logo_path, front_url, back_url FROM appcenter_application";
+	private static final String SQL_QUERY_DELETE_AUTHORIZED = "DELETE FROM appcenter_user_application_role WHERE id_application = ? ";
+	private static final String SQL_QUERY_SELECT_USER_ROLE = "SELECT id_role FROM appcenter_user_application_role WHERE id_application = ? AND id_user = ? ";
+	private static final String SQL_QUERY_INSERT_ENVIRONMENT = " INSERT INTO appcenter_application_environment ( id_application, environment_code ) VALUES ( ? , ? ) ";
+	private static final String SQL_QUERY_DELETE_ENVIRONMENT = " DELETE FROM appcenter_application_environment WHERE id_application = ? ";
 
-    // Constants
-    private static final String CONSTANT_WHERE = " WHERE ";
-    private static final String CONSTANT_WHERE_SEARCH = " ( code LIKE ? OR name LIKE ? ) ";
-    private static final String SQL_LIKE_WILDCARD = "%";
+	// Constants
+	private static final String CONSTANT_WHERE = " WHERE ";
+	private static final String CONSTANT_WHERE_SEARCH = " ( code LIKE ? OR name LIKE ? ) ";
+	private static final String SQL_LIKE_WILDCARD = "%";
 
-    /**
-     * Generates a new primary key
-     * 
-     * @param plugin
-     *            The Plugin
-     * @return The new primary key
-     */
-    public int newPrimaryKey( Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin );
-        daoUtil.executeQuery( );
-        int nKey = 1;
+	/**
+	 * Generates a new primary key
+	 * 
+	 * @param plugin
+	 *            The Plugin
+	 * @return The new primary key
+	 */
+	public int newPrimaryKey( Plugin plugin )
+	{
+		int nKey = 1;
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
+		{
+			daoUtil.executeQuery( );
 
-        if ( daoUtil.next( ) )
-        {
-            nKey = daoUtil.getInt( 1 ) + 1;
-        }
+			if ( daoUtil.next( ) )
+			{
+				nKey = daoUtil.getInt( 1 ) + 1;
+			}
 
-        daoUtil.free( );
-        return nKey;
-    }
+			daoUtil.free( );
+		}
+		return nKey;
+	}
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void insert( Application application, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
-        application.setId( newPrimaryKey( plugin ) );
-        int nIndex = 1;
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void insert( Application application, Plugin plugin )
+	{
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+		{
+			application.setId( newPrimaryKey( plugin ) );
+			int nIndex = 1;
 
-        daoUtil.setInt( nIndex++, application.getId( ) );
-        daoUtil.setString( nIndex++, application.getName( ) );
-        daoUtil.setString( nIndex++, application.getDescription( ) );
-        if( application.getOrganizationManager( )!=null)
-        {
-        	daoUtil.setInt( nIndex++, application.getOrganizationManager( ).getIdOrganization( ) );
-        }
-        else
-        {
-        	daoUtil.setIntNull( nIndex++);
-        	
-        }
-        daoUtil.setString( nIndex++, application.getApplicationData( ) );
-        daoUtil.setString( nIndex++, application.getCode( ) );
+			daoUtil.setInt( nIndex++, application.getId( ) );
+			daoUtil.setString( nIndex++, application.getName( ) );
+			daoUtil.setString( nIndex++, application.getDescription( ) );
+			if( application.getOrganizationManager( )!=null)
+			{
+				daoUtil.setInt( nIndex++, application.getOrganizationManager( ).getIdOrganization( ) );
+			}
+			else
+			{
+				daoUtil.setIntNull( nIndex++);
 
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+			}
+			daoUtil.setString( nIndex++, application.getApplicationData( ) );
+			daoUtil.setString( nIndex++, application.getCode( ) );
+			daoUtil.setString( nIndex++, application.getLogoPath( ) );
+			daoUtil.setString( nIndex++, application.getFrontURL( ) );
+			daoUtil.setString( nIndex++, application.getBackURL( ) );
 
-        for ( Environment envi : application.getListEnvironment( ) )
-        {
-            daoUtil = new DAOUtil( SQL_QUERY_INSERT_ENVIRONMENT, plugin );
-            nIndex = 1;
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
 
-            daoUtil.setInt( nIndex++, application.getId( ) );
-            daoUtil.setString( nIndex++, envi.getPrefix( ) );
+		for ( Environment envi : application.getListEnvironment( ) )
+		{
+			try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ENVIRONMENT, plugin ) )
+			{
+				int nIndex = 1;
 
-            daoUtil.executeUpdate( );
-            daoUtil.free( );
-        }
-    }
+				daoUtil.setInt( nIndex++, application.getId( ) );
+				daoUtil.setString( nIndex++, envi.getPrefix( ) );
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Application load( int nKey, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeQuery( );
-        Application application = null;
-        List<String> listEnvironmentCode = new ArrayList<>( );
-        List<Environment> listEnvironment = new ArrayList<>( );
+				daoUtil.executeUpdate( );
+				daoUtil.free( );
+			}
+		}
+	}
 
-        if ( daoUtil.next( ) )
-        {
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Application load( int nKey, Plugin plugin )
+	{
+		Application application = null;
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+		{
+			daoUtil.setInt( 1, nKey );
+			daoUtil.executeQuery( );
+			List<String> listEnvironmentCode = new ArrayList<>( );
+			List<Environment> listEnvironment = new ArrayList<>( );
 
-            application = new Application( );
-            int nIndex = 1;
+			if ( daoUtil.next( ) )
+			{
 
-            application.setId( daoUtil.getInt( nIndex++ ) );
-            application.setName( daoUtil.getString( nIndex++ ) );
-            application.setDescription( daoUtil.getString( nIndex++ ) );
-            OrganizationManager organizationManager = new OrganizationManager( );
-            organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
-            application.setOrganizationManager( organizationManager );
-            application.setApplicationData( daoUtil.getString( nIndex++ ) );
-            application.setCode( daoUtil.getString( nIndex++ ) );
-            String strEnviCode = daoUtil.getString( nIndex++ );
-            if ( strEnviCode != null )
-            {
-                listEnvironmentCode.add( strEnviCode );
-            }
-            while ( daoUtil.next( ) )
-            {
-                strEnviCode = daoUtil.getString( 7 );
-                if ( strEnviCode != null )
-                {
-                    listEnvironmentCode.add( strEnviCode );
-                }
-            }
-            for ( String enviCode : listEnvironmentCode )
-            {
-                Environment envi = Environment.getEnvironment( enviCode );
-                if ( envi != null )
-                {
-                    listEnvironment.add( envi );
-                }
-            }
-            application.setListEnvironment( listEnvironment );
-        }
+				application = new Application( );
+				int nIndex = 1;
+				
+				application.setId( daoUtil.getInt( nIndex++ ) );
+				application.setName( daoUtil.getString( nIndex++ ) );
+				application.setDescription( daoUtil.getString( nIndex++ ) );
+				OrganizationManager organizationManager = new OrganizationManager( );
+				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
+				application.setOrganizationManager( organizationManager );
+				application.setApplicationData( daoUtil.getString( nIndex++ ) );
+				application.setLogoPath( daoUtil.getString( nIndex++ ) );
+				application.setFrontURL( daoUtil.getString( nIndex++ ) );
+				application.setBackURL( daoUtil.getString( nIndex++ ) );
+				application.setCode( daoUtil.getString( nIndex++ ) );
+				String strEnviCode = daoUtil.getString( nIndex++ );
+				if ( strEnviCode != null )
+				{
+					listEnvironmentCode.add( strEnviCode );
+				}
+				while ( daoUtil.next( ) )
+				{
+					strEnviCode = daoUtil.getString( 10 );
+					if ( strEnviCode != null )
+					{
+						listEnvironmentCode.add( strEnviCode );
+					}
+				}
+				for ( String enviCode : listEnvironmentCode )
+				{
+					Environment envi = Environment.getEnvironment( enviCode );
+					if ( envi != null )
+					{
+						listEnvironment.add( envi );
+					}
+				}
+				application.setListEnvironment( listEnvironment );
 
-        daoUtil.free( );
-        return application;
-    }
+			}
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void delete( int nKey, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+			daoUtil.free( );
+		}
+		return application;
+	}
 
-        // Delete the environments for the application
-        daoUtil = new DAOUtil( SQL_QUERY_DELETE_ENVIRONMENT, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void delete( int nKey, Plugin plugin )
+	{
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+		{
+			daoUtil.setInt( 1, nKey );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
 
-        // Remove authorizations
-        daoUtil = new DAOUtil( SQL_QUERY_DELETE_AUTHORIZED, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
-    }
+		// Delete the environments for the application
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ENVIRONMENT, plugin ) )
+		{
+			daoUtil.setInt( 1, nKey );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void store( Application application, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
-        int nIndex = 1;
+		// Remove authorizations
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_AUTHORIZED, plugin ) )
+		{
+			daoUtil.setInt( 1, nKey );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
+	}
 
-        daoUtil.setString( nIndex++, application.getName( ) );
-        daoUtil.setString( nIndex++, application.getDescription( ) );
-        if(application.getOrganizationManager()!=null)
-        {
-        	daoUtil.setInt( nIndex++, application.getOrganizationManager( ).getIdOrganizationManager( ) );
-        }
-        else
-        {
-        	daoUtil.setIntNull(nIndex++);
-        	
-        }
-        
-        daoUtil.setString( nIndex++, application.getCode( ) );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void store( Application application, Plugin plugin )
+	{
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+		{
+			int nIndex = 1;
 
-        daoUtil.setInt( nIndex, application.getId( ) );
+			daoUtil.setString( nIndex++, application.getName( ) );
+			daoUtil.setString( nIndex++, application.getDescription( ) );
+			if( application.getOrganizationManager( )!=null )
+			{
+				daoUtil.setInt( nIndex++, application.getOrganizationManager( ).getIdOrganizationManager( ) );
+			}
+			else
+			{
+				daoUtil.setIntNull( nIndex++ );
 
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+			}
 
-        // Delete the environments for the application
-        daoUtil = new DAOUtil( SQL_QUERY_DELETE_ENVIRONMENT, plugin );
-        daoUtil.setInt( 1, application.getId( ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+			daoUtil.setString( nIndex++, application.getCode( ) );
+			daoUtil.setString( nIndex++, application.getLogoPath( ) );
+			daoUtil.setString( nIndex++, application.getFrontURL( ) );
+			daoUtil.setString( nIndex++, application.getBackURL( ) );
 
-        // Add the environments modified
-        for ( Environment envi : application.getListEnvironment( ) )
-        {
-            daoUtil = new DAOUtil( SQL_QUERY_INSERT_ENVIRONMENT, plugin );
-            nIndex = 1;
+			daoUtil.setInt( nIndex, application.getId( ) );
 
-            daoUtil.setInt( nIndex++, application.getId( ) );
-            daoUtil.setString( nIndex++, envi.getPrefix( ) );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
 
-            daoUtil.executeUpdate( );
-            daoUtil.free( );
-        }
+		// Delete the environments for the application
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ENVIRONMENT, plugin ) )
+		{
+			daoUtil.setInt( 1, application.getId( ) );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
 
-    }
+		// Add the environments modified
+		for ( Environment envi : application.getListEnvironment( ) )
+		{
+			try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ENVIRONMENT, plugin ) )
+			{
+				int nIndex = 1;
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void storeData( int nApplicationId, String strData, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_DATA, plugin );
-        int nIndex = 1;
+				daoUtil.setInt( nIndex++, application.getId( ) );
+				daoUtil.setString( nIndex++, envi.getPrefix( ) );
 
-        daoUtil.setString( nIndex++, strData );
-        daoUtil.setInt( nIndex, nApplicationId );
+				daoUtil.executeUpdate( );
+				daoUtil.free( );
+			}
+		}
 
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
-    }
+	}
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public List<Application> selectApplicationsList( Plugin plugin )
-    {
-        List<Application> applicationList = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void storeData( int nApplicationId, String strData, Plugin plugin )
+	{
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_DATA, plugin ) )
+		{
+			int nIndex = 1;
 
-        while ( daoUtil.next( ) )
-        {
-            Application application = new Application( );
-            int nIndex = 1;
+			daoUtil.setString( nIndex++, strData );
+			daoUtil.setInt( nIndex, nApplicationId );
 
-            application.setId( daoUtil.getInt( nIndex++ ) );
-            application.setName( daoUtil.getString( nIndex++ ) );
-            application.setDescription( daoUtil.getString( nIndex++ ) );
-            OrganizationManager organizationManager = new OrganizationManager( );
-            organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
-            application.setOrganizationManager( organizationManager );
-            application.setApplicationData( daoUtil.getString( nIndex++ ) );
-            application.setCode( daoUtil.getString( nIndex++ ) );
+			daoUtil.executeUpdate( );
+			daoUtil.free( );
+		}
+	}
 
-            applicationList.add( application );
-        }
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public List<Application> selectApplicationsList( Plugin plugin )
+	{
+		List<Application> applicationList = new ArrayList<>( );
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+		{
+			daoUtil.executeQuery( );
 
-        daoUtil.free( );
-        return applicationList;
-    }
+			while ( daoUtil.next( ) )
+			{
+				Application application = new Application( );
+				int nIndex = 1;
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public List<Application> selectApplicationsListByFilter( ApplicationFilter filter, Plugin plugin )
-    {
-        List<Application> applicationList = new ArrayList<>( );
-        StringBuilder strSqlQuery = new StringBuilder( SQL_QUERY_SELECTALL );
+				application.setId( daoUtil.getInt( nIndex++ ) );
+				application.setName( daoUtil.getString( nIndex++ ) );
+				application.setDescription( daoUtil.getString( nIndex++ ) );
+				OrganizationManager organizationManager = new OrganizationManager( );
+				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
+				application.setOrganizationManager( organizationManager );
+				application.setApplicationData( daoUtil.getString( nIndex++ ) );
+				application.setCode( daoUtil.getString( nIndex++ ) );
+				application.setLogoPath( daoUtil.getString( nIndex++ ) );
+				application.setFrontURL( daoUtil.getString( nIndex++ ) );
+				application.setBackURL( daoUtil.getString( nIndex++ ) );
 
-        if ( filter.hasSearch( ) )
-        {
-            strSqlQuery.append( CONSTANT_WHERE );
-            strSqlQuery.append( CONSTANT_WHERE_SEARCH );
-        }
+				applicationList.add( application );
+			}
 
-        DAOUtil daoUtil = new DAOUtil( strSqlQuery.toString( ), plugin );
-        int nIndex = 1;
-        if ( filter.hasSearch( ) )
-        {
-            daoUtil.setString( nIndex++, SQL_LIKE_WILDCARD + filter.getSearch( ) + SQL_LIKE_WILDCARD );
-            daoUtil.setString( nIndex++, SQL_LIKE_WILDCARD + filter.getSearch( ) + SQL_LIKE_WILDCARD );
-        }
+			daoUtil.free( );
+		}
+		return applicationList;
+	}
 
-        daoUtil.executeQuery( );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public List<Application> selectApplicationsListByFilter( ApplicationFilter filter, Plugin plugin )
+	{
+		List<Application> applicationList = new ArrayList<>( );
+		StringBuilder strSqlQuery = new StringBuilder( SQL_QUERY_SELECTALL );
 
-        while ( daoUtil.next( ) )
-        {
-            Application application = new Application( );
-            nIndex = 1;
+		if ( filter.hasSearch( ) )
+		{
+			strSqlQuery.append( CONSTANT_WHERE );
+			strSqlQuery.append( CONSTANT_WHERE_SEARCH );
+		}
 
-            application.setId( daoUtil.getInt( nIndex++ ) );
-            application.setName( daoUtil.getString( nIndex++ ) );
-            application.setDescription( daoUtil.getString( nIndex++ ) );
-            OrganizationManager organizationManager = new OrganizationManager( );
-            organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
-            application.setOrganizationManager( organizationManager );
-            application.setApplicationData( daoUtil.getString( nIndex++ ) );
-            application.setCode( daoUtil.getString( nIndex++ ) );
+		try( DAOUtil daoUtil = new DAOUtil( strSqlQuery.toString( ), plugin ) )
+		{
+			int nIndex = 1;
+			if ( filter.hasSearch( ) )
+			{
+				daoUtil.setString( nIndex++, SQL_LIKE_WILDCARD + filter.getSearch( ) + SQL_LIKE_WILDCARD );
+				daoUtil.setString( nIndex++, SQL_LIKE_WILDCARD + filter.getSearch( ) + SQL_LIKE_WILDCARD );
+			}
 
-            applicationList.add( application );
-        }
+			daoUtil.executeQuery( );
 
-        daoUtil.free( );
-        return applicationList;
-    }
+			while ( daoUtil.next( ) )
+			{
+				Application application = new Application( );
+				nIndex = 1;
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public ReferenceList selectApplicationsReferenceList( Plugin plugin )
-    {
-        ReferenceList applicationList = new ReferenceList( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
+				application.setId( daoUtil.getInt( nIndex++ ) );
+				application.setName( daoUtil.getString( nIndex++ ) );
+				application.setDescription( daoUtil.getString( nIndex++ ) );
+				OrganizationManager organizationManager = new OrganizationManager( );
+				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
+				application.setOrganizationManager( organizationManager );
+				application.setApplicationData( daoUtil.getString( nIndex++ ) );
+				application.setCode( daoUtil.getString( nIndex++ ) );
 
-        while ( daoUtil.next( ) )
-        {
-            applicationList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
-        }
+				applicationList.add( application );
+			}
 
-        daoUtil.free( );
-        return applicationList;
-    }
+			daoUtil.free( );
+		}
+		return applicationList;
+	}
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Map<String, Application> selectApplicationsMap( Plugin plugin )
-    {
-        Map<String, Application> applicationsMap = new HashMap<String, Application>( );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public ReferenceList selectApplicationsReferenceList( Plugin plugin )
+	{
+		ReferenceList applicationList = new ReferenceList( );
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+		{
+			daoUtil.executeQuery( );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
+			while ( daoUtil.next( ) )
+			{
+				applicationList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+			}
 
-        while ( daoUtil.next( ) )
-        {
-            Application application = new Application( );
-            int nIndex = 1;
+			daoUtil.free( );
+		}
+		return applicationList;
+	}
 
-            application.setId( daoUtil.getInt( nIndex++ ) );
-            application.setName( daoUtil.getString( nIndex++ ) );
-            application.setDescription( daoUtil.getString( nIndex++ ) );
-            OrganizationManager organizationManager = new OrganizationManager( );
-            organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
-            application.setOrganizationManager( organizationManager );
-            application.setApplicationData( daoUtil.getString( nIndex++ ) );
-            application.setCode( daoUtil.getString( nIndex++ ) );
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Map<String, Application> selectApplicationsMap( Plugin plugin )
+	{
+		Map<String, Application> applicationsMap = new HashMap<>( );
 
-            applicationsMap.put( Integer.toString( application.getId( ) ), application );
-        }
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+		{
+			daoUtil.executeQuery( );
 
-        daoUtil.free( );
+			while ( daoUtil.next( ) )
+			{
+				Application application = new Application( );
+				int nIndex = 1;
 
-        return applicationsMap;
-    }
+				application.setId( daoUtil.getInt( nIndex++ ) );
+				application.setName( daoUtil.getString( nIndex++ ) );
+				application.setDescription( daoUtil.getString( nIndex++ ) );
+				OrganizationManager organizationManager = new OrganizationManager( );
+				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
+				application.setOrganizationManager( organizationManager );
+				application.setApplicationData( daoUtil.getString( nIndex++ ) );
+				application.setCode( daoUtil.getString( nIndex++ ) );
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public int getUserRole( int nApplicationId, String strUserId, int nDefaultRole, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_USER_ROLE );
-        daoUtil.setInt( 1, nApplicationId );
-        daoUtil.setString( 2, strUserId );
-        daoUtil.executeQuery( );
+				applicationsMap.put( Integer.toString( application.getId( ) ), application );
+			}
 
-        int nRole = nDefaultRole;
-        if ( daoUtil.next( ) )
-        {
-            nRole = daoUtil.getInt( 1 );
-        }
+			daoUtil.free( );
+		}
 
-        daoUtil.free( );
-        return nRole;
+		return applicationsMap;
+	}
 
-    }
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public int getUserRole( int nApplicationId, String strUserId, int nDefaultRole, Plugin plugin )
+	{
+		int nRole = nDefaultRole;
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_USER_ROLE ) )
+		{
+			daoUtil.setInt( 1, nApplicationId );
+			daoUtil.setString( 2, strUserId );
+			daoUtil.executeQuery( );
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Application loadByCode( String strCode, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_CODE, plugin );
-        daoUtil.setString( 1, strCode );
-        daoUtil.executeQuery( );
-        Application application = null;
-        List<String> listEnvironmentCode = new ArrayList<>( );
-        List<Environment> listEnvironment = new ArrayList<>( );
+			if ( daoUtil.next( ) )
+			{
+				nRole = daoUtil.getInt( 1 );
+			}
 
-        if ( daoUtil.next( ) )
-        {
+			daoUtil.free( );
+		}
+		return nRole;
 
-            application = new Application( );
-            int nIndex = 1;
+	}
 
-            application.setId( daoUtil.getInt( nIndex++ ) );
-            application.setName( daoUtil.getString( nIndex++ ) );
-            application.setDescription( daoUtil.getString( nIndex++ ) );
-            OrganizationManager organizationManager = new OrganizationManager( );
-            organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
-            application.setOrganizationManager( organizationManager );
-            application.setApplicationData( daoUtil.getString( nIndex++ ) );
-            application.setCode( daoUtil.getString( nIndex++ ) );
-            String strEnviCode = daoUtil.getString( nIndex++ );
-            if ( strEnviCode != null )
-            {
-                listEnvironmentCode.add( strEnviCode );
-            }
-            while ( daoUtil.next( ) )
-            {
-                strEnviCode = daoUtil.getString( 7 );
-                if ( strEnviCode != null )
-                {
-                    listEnvironmentCode.add( strEnviCode );
-                }
-            }
-            for ( String enviCode : listEnvironmentCode )
-            {
-                Environment envi = Environment.getEnvironment( enviCode );
-                if ( envi != null )
-                {
-                    listEnvironment.add( envi );
-                }
-            }
-            application.setListEnvironment( listEnvironment );
-        }
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Application loadByCode( String strCode, Plugin plugin )
+	{
+		Application application = null;
+		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_CODE, plugin ) )
+		{
+			daoUtil.setString( 1, strCode );
+			daoUtil.executeQuery( );
+			List<String> listEnvironmentCode = new ArrayList<>( );
+			List<Environment> listEnvironment = new ArrayList<>( );
 
-        daoUtil.free( );
-        return application;
-    }
+			if ( daoUtil.next( ) )
+			{
+
+				application = new Application( );
+				int nIndex = 1;
+
+				application.setId( daoUtil.getInt( nIndex++ ) );
+				application.setName( daoUtil.getString( nIndex++ ) );
+				application.setDescription( daoUtil.getString( nIndex++ ) );
+				OrganizationManager organizationManager = new OrganizationManager( );
+				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
+				application.setOrganizationManager( organizationManager );
+				application.setApplicationData( daoUtil.getString( nIndex++ ) );
+				application.setCode( daoUtil.getString( nIndex++ ) );
+				String strEnviCode = daoUtil.getString( nIndex++ );
+				if ( strEnviCode != null )
+				{
+					listEnvironmentCode.add( strEnviCode );
+				}
+				while ( daoUtil.next( ) )
+				{
+					strEnviCode = daoUtil.getString( 7 );
+					if ( strEnviCode != null )
+					{
+						listEnvironmentCode.add( strEnviCode );
+					}
+				}
+				for ( String enviCode : listEnvironmentCode )
+				{
+					Environment envi = Environment.getEnvironment( enviCode );
+					if ( envi != null )
+					{
+						listEnvironment.add( envi );
+					}
+				}
+				application.setListEnvironment( listEnvironment );
+			}
+
+			daoUtil.free( );
+		}
+		return application;
+	}
 }

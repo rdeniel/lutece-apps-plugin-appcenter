@@ -59,15 +59,16 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     @Override
     public void insert( DemandValidation demandValidation, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT , plugin );
-
-        daoUtil.setInt( 1, demandValidation.getIdDemand(  ) );
-        daoUtil.setInt( 2, demandValidation.getIdTask(  ) );
-        daoUtil.setInt( 3, demandValidation.getStatus(  ) );
-        daoUtil.setString( 4, demandValidation.getIdUser(  ) );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT , plugin ) )
+        {
+	        daoUtil.setInt( 1, demandValidation.getIdDemand(  ) );
+	        daoUtil.setInt( 2, demandValidation.getIdTask(  ) );
+	        daoUtil.setInt( 3, demandValidation.getStatus(  ) );
+	        daoUtil.setString( 4, demandValidation.getIdUser(  ) );
+	
+	        daoUtil.executeUpdate(  );
+	        daoUtil.free(  );
+        }
     }
 
     /**
@@ -76,24 +77,25 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     @Override
     public DemandValidation load( int nId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nId );
-        daoUtil.executeQuery(  );
-
-        DemandValidation demandValidation = null;
-
-        if ( daoUtil.next(  ) )
+    	DemandValidation demandValidation = null;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            demandValidation = new DemandValidation(  );
-            int nIndex = 0;
-            demandValidation.setId( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdDemand( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdTask( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setStatus( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdUser( daoUtil.getString( ++nIndex ) );
+	        daoUtil.setInt( 1, nId );
+	        daoUtil.executeQuery(  );
+	
+	        if ( daoUtil.next(  ) )
+	        {
+	            demandValidation = new DemandValidation(  );
+	            int nIndex = 0;
+	            demandValidation.setId( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdDemand( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdTask( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setStatus( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdUser( daoUtil.getString( ++nIndex ) );
+	        }
+	
+	        daoUtil.free(  );
         }
-
-        daoUtil.free(  );
 
         return demandValidation;
     }
@@ -106,24 +108,26 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     {
         List<DemandValidation> listDemandValidations = new ArrayList<>(  );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_DEMAND, plugin );
-        daoUtil.setInt( 1 , nIdDemand );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_DEMAND, plugin ) )
         {
-            DemandValidation demandValidation = new DemandValidation(  );
-            int nIndex = 0;
-            demandValidation.setId( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdDemand( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdTask( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setStatus( daoUtil.getInt( ++nIndex ) );
-            demandValidation.setIdUser( daoUtil.getString( ++nIndex ) );
-
-            listDemandValidations.add( demandValidation );
+	        daoUtil.setInt( 1 , nIdDemand );
+	        daoUtil.executeQuery(  );
+	
+	        if ( daoUtil.next(  ) )
+	        {
+	            DemandValidation demandValidation = new DemandValidation(  );
+	            int nIndex = 0;
+	            demandValidation.setId( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdDemand( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdTask( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setStatus( daoUtil.getInt( ++nIndex ) );
+	            demandValidation.setIdUser( daoUtil.getString( ++nIndex ) );
+	
+	            listDemandValidations.add( demandValidation );
+	        }
+	
+	        daoUtil.free(  );
         }
-
-        daoUtil.free(  );
 
         return listDemandValidations;
     }
@@ -134,10 +138,12 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     @Override
     public void delete( int nId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+	        daoUtil.setInt( 1, nId );
+	        daoUtil.executeUpdate(  );
+	        daoUtil.free(  );
+        }
     }
 
     /**
@@ -146,17 +152,19 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     @Override
     public void store( DemandValidation demandValidation, Plugin plugin )
     {
-            DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
+            try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+            {
 
-            int nIndex = 0;
-            daoUtil.setInt( ++nIndex, demandValidation.getIdDemand(  ) );
-            daoUtil.setInt( ++nIndex, demandValidation.getIdTask(  ) );
-            daoUtil.setInt( ++nIndex, demandValidation.getStatus(  ) );
-            daoUtil.setString( ++nIndex, demandValidation.getIdUser(  ) );
-            daoUtil.setInt( ++nIndex, demandValidation.getId(  ) );
-
-            daoUtil.executeUpdate(  );
-            daoUtil.free(  );
+	            int nIndex = 0;
+	            daoUtil.setInt( ++nIndex, demandValidation.getIdDemand(  ) );
+	            daoUtil.setInt( ++nIndex, demandValidation.getIdTask(  ) );
+	            daoUtil.setInt( ++nIndex, demandValidation.getStatus(  ) );
+	            daoUtil.setString( ++nIndex, demandValidation.getIdUser(  ) );
+	            daoUtil.setInt( ++nIndex, demandValidation.getId(  ) );
+	
+	            daoUtil.executeUpdate(  );
+	            daoUtil.free(  );
+            }
     }
 
     /**
@@ -166,23 +174,25 @@ public final class DemandValidationDAO implements IDemandValidationDAO
     public List<DemandValidation> selectDemandValidationsList( Plugin plugin )
     {
         List<DemandValidation> listDemandValidations = new ArrayList<>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery(  );
-
-        while ( daoUtil.next(  ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            DemandValidation demandValidation = new DemandValidation(  );
-
-            demandValidation.setId( daoUtil.getInt( 1 ) );
-            demandValidation.setIdDemand( daoUtil.getInt( 2 ) );
-            demandValidation.setIdTask( daoUtil.getInt( 3 ) );
-            demandValidation.setStatus( daoUtil.getInt( 4 ) );
-            demandValidation.setIdUser( daoUtil.getString( 5 ) );
-
-            listDemandValidations.add( demandValidation );
+	        daoUtil.executeQuery(  );
+	
+	        while ( daoUtil.next(  ) )
+	        {
+	            DemandValidation demandValidation = new DemandValidation(  );
+	
+	            demandValidation.setId( daoUtil.getInt( 1 ) );
+	            demandValidation.setIdDemand( daoUtil.getInt( 2 ) );
+	            demandValidation.setIdTask( daoUtil.getInt( 3 ) );
+	            demandValidation.setStatus( daoUtil.getInt( 4 ) );
+	            demandValidation.setIdUser( daoUtil.getString( 5 ) );
+	
+	            listDemandValidations.add( demandValidation );
+	        }
+	
+	        daoUtil.free(  );
         }
-
-        daoUtil.free(  );
 
         return listDemandValidations;
     }

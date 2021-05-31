@@ -40,7 +40,7 @@ public class ApplicationData
 {
 
     private Integer _nIdApplicationData;
-    private List<Integer> _listIdDemandAssociated = new ArrayList<Integer>( );
+    private List<Integer> _listIdDemandAssociated = new ArrayList<>( );
     private String _strEnvironment;
 
     /**

@@ -38,28 +38,30 @@ import fr.paris.lutece.plugins.appcenter.business.ApplicationFilter;
 import fr.paris.lutece.plugins.appcenter.business.ApplicationHome;
 import fr.paris.lutece.plugins.appcenter.business.UserApplicationRole;
 import fr.paris.lutece.plugins.appcenter.business.UserApplicationRoleHome;
-import fr.paris.lutece.plugins.appcenter.business.organization.Organization;
 import fr.paris.lutece.plugins.appcenter.business.organization.OrganizationHome;
 import fr.paris.lutece.plugins.appcenter.business.organization.OrganizationManager;
 import fr.paris.lutece.plugins.appcenter.business.organization.OrganizationManagerHome;
+import fr.paris.lutece.plugins.appcenter.service.AppcenterAsynchronousUploadHandler;
 import fr.paris.lutece.plugins.appcenter.service.ApplicationService;
 import fr.paris.lutece.plugins.appcenter.util.AppCenterUtils;
 import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.constants.Parameters;
-import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sort.AttributeComparator;
 import fr.paris.lutece.util.url.UrlItem;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import java.util.List;
@@ -67,6 +69,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -75,7 +80,12 @@ import org.apache.commons.lang3.StringUtils;
 @Controller( controllerJsp = "ManageApplications.jsp", controllerPath = "jsp/admin/plugins/appcenter/", right = "APPCENTER_MANAGEMENT" )
 public class ApplicationJspBean extends ManageAppCenterJspBean
 {
-    // Templates
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7502636023989869309L;
+	
+	// Templates
     private static final String TEMPLATE_MANAGE_APPLICATIONS = "/admin/plugins/appcenter/manage_applications.html";
     private static final String TEMPLATE_CREATE_APPLICATION = "/admin/plugins/appcenter/create_application.html";
     private static final String TEMPLATE_MODIFY_APPLICATION = "/admin/plugins/appcenter/modify_application.html";
@@ -109,6 +119,7 @@ public class ApplicationJspBean extends ManageAppCenterJspBean
     private static final String MARK_ORGANIZATIONS = "list_organizations";
     private static final String MARK_ORGANIZATION_MANAGERS = "list_organization_managers";
     private static final String MARK_WEBAPP_URL = "webapp_url";
+    private static final String MARK_HANDLER = "handler";
 
     private static final String JSP_MANAGE_APPLICATIONS = "jsp/admin/plugins/appcenter/ManageApplications.jsp";
 
@@ -236,6 +247,7 @@ public class ApplicationJspBean extends ManageAppCenterJspBean
         Map<String, Object> model = getModel( );
         model.put( MARK_APPLICATION, _application );
         model.put( MARK_ORGANIZATIONS, organizationsList );
+        model.put( MARK_HANDLER, SpringContextService.getBean( "appcenterAsynchronousUploadHandler" ) );
         model.put( MARK_ORGANIZATION_MANAGERS, OrganizationManagerHome.getOrganizationManagersList( ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_APPLICATION, TEMPLATE_CREATE_APPLICATION, model );
@@ -272,7 +284,22 @@ public class ApplicationJspBean extends ManageAppCenterJspBean
         {
             return redirectView( request, VIEW_CREATE_APPLICATION );
         }
-
+        
+        List<FileItem> uploadedFiles = new AppcenterAsynchronousUploadHandler().getListUploadedFiles("logo_path", request.getSession( ) );
+        
+        if( !uploadedFiles.isEmpty( ) ) 
+        {
+        	FileItem uploadedFile = uploadedFiles.get(0);
+        	String filePath = "/"+_application.getName( );
+        	File file = new File( filePath );
+        	try {
+				uploadedFile.write( file );
+			} catch (Exception e) {
+				throw new AppException("Error creating file", e);
+			}
+        	_application.setLogoPath( filePath );
+        }
+        
         ApplicationHome.create( _application );
         addInfo( INFO_APPLICATION_CREATED, getLocale( ) );
 

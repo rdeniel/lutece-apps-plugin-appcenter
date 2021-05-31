@@ -120,4 +120,6 @@
             <value>0</value>
         </property>
     </bean>
+    <!--  FileUpload -->
+    <bean id="appcenterAsynchronousUploadHandler" class="fr.paris.lutece.plugins.appcenter.service.AppcenterAsynchronousUploadHandler"/>
 </beans>

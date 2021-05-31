@@ -56,7 +56,7 @@
                                     </#list>
                                     <small id="descriptionHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelEnvironments.help}</small>
                                 </div>
-			</div>
+			            </div>
                         <div class="form-group row ">
                             <label for="name" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelStepByStep} </label>
                             <div class="panel panel-default col-sm-12 col-md-10 ml-auto">
@@ -93,15 +93,36 @@
                                 </#list>
                             </div>
                         </div>
-			<div class="form-group row">
-				<div class="col-sm-12 col-md-10 ml-auto">
-					<@button name='action_createApplication' type='submit' tabIndex='3' title='#i18n{portal.util.labelCreate}' buttonIcon='plus' />
-					<@button name='view_manageApplications' type='submit' title='#i18n{portal.util.labelCancel}' buttonIcon='close' />
-				</div>
-			</div>
-    </fieldset>
-    </@tform>
-	</@columns>
+                        <div class="form-group row">
+                            <label for="file" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelLogo}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="file" id="logo" name="logo" value="" maxlength="255" class="form-control" aria-describedby="nameHelpBlock" accept="image/png, image/jpeg" />
+                                <small id="fileHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelLogo.help}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="frontURL" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelFrontURL}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="text" id="frontURL" name="frontURL" value="${application.frontURL!""}" maxlength="255" class="form-control" aria-describedby="frontURLHelpBlock" />
+                                <small id="frontURLHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelFrontURL.help}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="backURL" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelBackURL}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="text" id="backURL" name="backURL" value="${application.backURL!""}" maxlength="255" class="form-control" aria-describedby="backURLHelpBlock" />
+                                <small id="backURLHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelBackURL.help}</small>
+                            </div>
+                        </div>
+			            <div class="form-group row">
+				            <div class="col-sm-12 col-md-10 ml-auto">
+					           <@button name='action_createApplication' type='submit' tabIndex='3' title='#i18n{portal.util.labelCreate}' buttonIcon='plus' />
+					           <@button name='view_manageApplications' type='submit' title='#i18n{portal.util.labelCancel}' buttonIcon='close' />
+				            </div>
+			            </div>
+                </fieldset>
+            </@tform>
+	   </@columns>
 </@row>
 
 <script>

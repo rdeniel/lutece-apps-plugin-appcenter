@@ -132,6 +132,27 @@
                                                                     </#if>
                                                                 </#list>
 						</div>
+						<div class="form-group row">
+                            <label for="file" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelLogo}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="file" id="logo" name="logo" value="" maxlength="255" class="form-control" aria-describedby="nameHelpBlock" accept="image/png, image/jpeg" />
+                                <small id="fileHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelLogo.help}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="frontURL" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelFrontURL}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="text" id="frontURL" name="frontURL" value="${application.frontURL!""}" maxlength="255" class="form-control" aria-describedby="frontURLHelpBlock" />
+                                <small id="frontURLHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelFrontURL.help}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="backURL" class="col-sm-12 col-md-2 col-form-label">#i18n{appcenter.create_application.labelBackURL}</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="text" id="backURL" name="backURL" value="${application.backURL!""}" maxlength="255" class="form-control" aria-describedby="backURLHelpBlock" />
+                                <small id="backURLHelpBlock" class="form-text text-muted">#i18n{appcenter.create_application.labelBackURL.help}</small>
+                            </div>
+                        </div>
 					</div>
 					<div class="modal-footer">
 						<button type="submit" name="action_modifyApplication" class="btn btn-primary">#i18n{portal.util.labelModify}</button>

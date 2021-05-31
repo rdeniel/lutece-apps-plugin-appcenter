@@ -1,4 +1,6 @@
 <#include "manageappcenter_tabs.html" />
+<#include "/skin/plugins/asynchronousupload/upload_commons.html" />
+<@addRequiredJsFiles />
 <@tabs2 tab="application" />
 <@box>
 	<@boxHeader title='#i18n{appcenter.create_application.title}' />
@@ -31,11 +33,18 @@
 				<@formGroup labelKey='#i18n{appcenter.create_application.labelApplicationData}' helpKey='#i18n{appcenter.create_application.labelApplicationData.help}' >
 					<@input type='text' name='application_data' value='${application.ApplicationData!\'\'}' />
 				</@formGroup>
-				
+                <@addFileInputAndfilesBox fieldName="logo_path" handler=handler listUploadedFiles= '' inputCssClass='' multiple=false />
+                <@formGroup labelKey='#i18n{appcenter.create_application.labelFrontURL}' helpKey='' mandatory=false>
+                    <@input type='text' name='front_URL' value='${application.frontURL!\'\'}' />
+                </@formGroup>
+                <@formGroup labelKey='#i18n{appcenter.create_application.labelBackURL}' helpKey='' mandatory=false>
+                    <@input type='text' name='back_URL' value='${application.backURL!\'\'}' />
+                </@formGroup>
 				<@actionButtons button1Name="action_createApplication" button2Name="view_manageApplication"/>
     </@tform>
 	</@boxBody>
 </@box>
+<script type="text/javascript" src="jsp/site/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=appcenterAsynchronousUploadHandler"></script>
 <script>
     $(function() {
         $('#organization_manager_formgroup').hide();

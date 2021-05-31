@@ -89,32 +89,34 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void insert( Demand demand, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin );
-        int nIndex = 1;
-
-        daoUtil.setString( nIndex++, demand.getIdUserFront( ) );
-        daoUtil.setString( nIndex++, demand.getStatusText( ) );
-        daoUtil.setString( nIndex++, demand.getIdDemandType( ) );
-        daoUtil.setString( nIndex++, demand.getDemandType( ) );
-        daoUtil.setInt( nIndex++, demand.getIdApplication( ) );
-        daoUtil.setString( nIndex++, demand.getDemandData( ) );
-        daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) );
-        daoUtil.setBoolean( nIndex++, demand.isClosed( ) );
-        if ( demand.getEnvironment( ) != null )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
-            daoUtil.setString( nIndex++, demand.getEnvironment( ).getPrefix( ) );
+	        int nIndex = 1;
+	
+	        daoUtil.setString( nIndex++, demand.getIdUserFront( ) );
+	        daoUtil.setString( nIndex++, demand.getStatusText( ) );
+	        daoUtil.setString( nIndex++, demand.getIdDemandType( ) );
+	        daoUtil.setString( nIndex++, demand.getDemandType( ) );
+	        daoUtil.setInt( nIndex++, demand.getIdApplication( ) );
+	        daoUtil.setString( nIndex++, demand.getDemandData( ) );
+	        daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) );
+	        daoUtil.setBoolean( nIndex++, demand.isClosed( ) );
+	        if ( demand.getEnvironment( ) != null )
+	        {
+	            daoUtil.setString( nIndex++, demand.getEnvironment( ).getPrefix( ) );
+	        }
+	        else
+	        {
+	            daoUtil.setString( nIndex++, "" );
+	        }
+	
+	        daoUtil.executeUpdate( );
+	        daoUtil.nextGeneratedKey( );
+	
+	        demand.setId( daoUtil.getGeneratedKeyInt( 1 ) );
+	
+	        daoUtil.free( );
         }
-        else
-        {
-            daoUtil.setString( nIndex++, "" );
-        }
-
-        daoUtil.executeUpdate( );
-        daoUtil.nextGeneratedKey( );
-
-        demand.setId( daoUtil.getGeneratedKeyInt( 1 ) );
-
-        daoUtil.free( );
     }
 
     /**
@@ -123,18 +125,21 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand load( int nKey, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeQuery( );
-        Demand demand = null;
-
-        if ( daoUtil.next( ) )
+    	Demand demand = null;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            // TODO use finally for free because this throws
-            demand = getRow( daoUtil );
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            // TODO use finally for free because this throws
+	            demand = getRow( daoUtil );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
+        
         return demand;
     }
 
@@ -144,18 +149,21 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public <T extends Demand> T load( int nKey, Class<T> demandClass, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeQuery( );
-        T demand = null;
-
-        if ( daoUtil.next( ) )
+    	T demand = null;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            // TODO use finally for free because this throws
-            demand = getRow( daoUtil, demandClass );
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            // TODO use finally for free because this throws
+	            demand = getRow( daoUtil, demandClass );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
+        
         return demand;
     }
 
@@ -165,10 +173,12 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+        }
     }
 
     /**
@@ -177,31 +187,33 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void store( Demand demand, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
-        int nIndex = 1;
-
-        daoUtil.setInt( nIndex++, demand.getId( ) );
-        daoUtil.setString( nIndex++, demand.getIdUserFront( ) );
-        daoUtil.setString( nIndex++, demand.getStatusText( ) );
-        daoUtil.setString( nIndex++, demand.getIdDemandType( ) );
-        daoUtil.setString( nIndex++, demand.getDemandType( ) );
-        daoUtil.setInt( nIndex++, demand.getIdApplication( ) );
-        daoUtil.setString( nIndex++, demand.getDemandData( ) );
-        daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) );
-        daoUtil.setBoolean( nIndex++, demand.isClosed( ) );
-        if ( demand.getEnvironment( ) != null )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
-            daoUtil.setString( nIndex++, demand.getEnvironment( ).getPrefix( ) );
+	        int nIndex = 1;
+	
+	        daoUtil.setInt( nIndex++, demand.getId( ) );
+	        daoUtil.setString( nIndex++, demand.getIdUserFront( ) );
+	        daoUtil.setString( nIndex++, demand.getStatusText( ) );
+	        daoUtil.setString( nIndex++, demand.getIdDemandType( ) );
+	        daoUtil.setString( nIndex++, demand.getDemandType( ) );
+	        daoUtil.setInt( nIndex++, demand.getIdApplication( ) );
+	        daoUtil.setString( nIndex++, demand.getDemandData( ) );
+	        daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) );
+	        daoUtil.setBoolean( nIndex++, demand.isClosed( ) );
+	        if ( demand.getEnvironment( ) != null )
+	        {
+	            daoUtil.setString( nIndex++, demand.getEnvironment( ).getPrefix( ) );
+	        }
+	        else
+	        {
+	            daoUtil.setString( nIndex++, "" );
+	        }
+	
+	        daoUtil.setInt( nIndex, demand.getId( ) );
+	
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
         }
-        else
-        {
-            daoUtil.setString( nIndex++, "" );
-        }
-
-        daoUtil.setInt( nIndex, demand.getId( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
     }
 
     /**
@@ -210,19 +222,22 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public List<Demand> selectDemandsList( Plugin plugin )
     {
-        List<Demand> demandList = new ArrayList<Demand>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Demand> demandList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            // TODO use finally for free because this throws
-            Demand demand = getRow( daoUtil );
-
-            demandList.add( demand );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            // TODO use finally for free because this throws
+	            Demand demand = getRow( daoUtil );
+	
+	            demandList.add( demand );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
+        
         return demandList;
     }
 
@@ -232,21 +247,23 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public List<Demand> selectDemandsListByApplication( int nIdApplication, Plugin plugin )
     {
-        List<Demand> demandList = new ArrayList<Demand>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION, plugin );
-        int nIndex = 1;
-        daoUtil.setInt( nIndex++, nIdApplication );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Demand> demandList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION, plugin ) )
         {
-            // TODO use finally for free because this throws
-            Demand demand = getRow( daoUtil );
-
-            demandList.add( demand );
+	        int nIndex = 1;
+	        daoUtil.setInt( nIndex++, nIdApplication );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            // TODO use finally for free because this throws
+	            Demand demand = getRow( daoUtil );
+	
+	            demandList.add( demand );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return demandList;
     }
 
@@ -256,22 +273,24 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public <T extends Demand> List<T> selectDemandsListByApplicationAndType( int nIdApplication, String strDemandType, Class<T> demandClass, Plugin plugin )
     {
-        List<T> demandList = new ArrayList<T>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION_AND_TYPE, plugin );
-        int nIndex = 1;
-        daoUtil.setInt( nIndex++, nIdApplication );
-        daoUtil.setString( nIndex++, strDemandType );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<T> demandList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION_AND_TYPE, plugin ) )
         {
-            // TODO use finally for free because this throws
-            T demand = getRow( daoUtil, demandClass );
-
-            demandList.add( demand );
+	        int nIndex = 1;
+	        daoUtil.setInt( nIndex++, nIdApplication );
+	        daoUtil.setString( nIndex++, strDemandType );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            // TODO use finally for free because this throws
+	            T demand = getRow( daoUtil, demandClass );
+	
+	            demandList.add( demand );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return demandList;
     }
 
@@ -281,16 +300,18 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public List<Integer> selectIdDemandsList( Plugin plugin )
     {
-        List<Integer> demandList = new ArrayList<Integer>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Integer> demandList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-            demandList.add( daoUtil.getInt( 1 ) );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            demandList.add( daoUtil.getInt( 1 ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return demandList;
     }
 
@@ -301,15 +322,17 @@ public final class DemandDAO implements IDemandDAO
     public ReferenceList selectDemandsReferenceList( Plugin plugin )
     {
         ReferenceList demandList = new ReferenceList( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            demandList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            demandList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return demandList;
     }
 
@@ -350,38 +373,41 @@ public final class DemandDAO implements IDemandDAO
     public <T extends Demand> List<T> selectListFullDemands( int nIdApplication, List<DemandType> listDemandType, Plugin plugin )
     {
         List<T> demandList = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION, plugin );
-        daoUtil.setInt( 1, nIdApplication );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_APPLICATION, plugin ) )
         {
-            try
-            {
-                // TODO use finally for free because this throws
-                String strDemandData = daoUtil.getString( 7 );
-                String strDemandType = daoUtil.getString( 4 );
-                T demand = (T) _mapper.readValue( strDemandData, DemandTypeService.getClassByDemandTypeId( strDemandType, listDemandType ) );
-                demand.setId( daoUtil.getInt( 1 ) );
-                demand.setIdUserFront( daoUtil.getString( 2 ) );
-                demand.setStatusText( daoUtil.getString( 3 ) );
-                demand.setIdDemandType( strDemandType );
-                demand.setDemandType( daoUtil.getString( 5 ) );
-                demand.setIdApplication( daoUtil.getInt( 6 ) );
-                demand.setDemandData( strDemandData );
-                demand.setCreationDate( daoUtil.getTimestamp( 8 ) );
-                demand.setIsClosed( daoUtil.getBoolean( 9 ) );
-                demand.setEnvironment( Environment.getEnvironment( daoUtil.getString( 10 ) ) );
-
-                demandList.add( demand );
-            }
-            catch( IOException e )
-            {
-                AppLogService.error( "Unable to parse demand data JSON to demand type " );
-            }
+	        daoUtil.setInt( 1, nIdApplication );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            try
+	            {
+	                // TODO use finally for free because this throws
+	                String strDemandData = daoUtil.getString( 7 );
+	                String strDemandType = daoUtil.getString( 4 );
+	                T demand = (T) _mapper.readValue( strDemandData, DemandTypeService.getClassByDemandTypeId( strDemandType, listDemandType ) );
+	                demand.setId( daoUtil.getInt( 1 ) );
+	                demand.setIdUserFront( daoUtil.getString( 2 ) );
+	                demand.setStatusText( daoUtil.getString( 3 ) );
+	                demand.setIdDemandType( strDemandType );
+	                demand.setDemandType( daoUtil.getString( 5 ) );
+	                demand.setIdApplication( daoUtil.getInt( 6 ) );
+	                demand.setDemandData( strDemandData );
+	                demand.setCreationDate( daoUtil.getTimestamp( 8 ) );
+	                demand.setIsClosed( daoUtil.getBoolean( 9 ) );
+	                demand.setEnvironment( Environment.getEnvironment( daoUtil.getString( 10 ) ) );
+	
+	                demandList.add( demand );
+	            }
+	            catch( IOException e )
+	            {
+	                AppLogService.error( "Unable to parse demand data JSON to demand type " );
+	            }
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
+        
         return demandList;
     }
 
@@ -391,7 +417,7 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public List<Demand> selectDemandsListByFilter( DemandFilter filter, Plugin plugin )
     {
-        List<Demand> demandList = new ArrayList<Demand>( );
+        List<Demand> demandList = new ArrayList<>( );
         StringBuilder strSqlQuery = new StringBuilder( SQL_QUERY_SELECTALL );
 
         if ( filter.hasApplication( ) )
@@ -431,33 +457,35 @@ public final class DemandDAO implements IDemandDAO
         strSqlQuery.append( CONSTANT_ORDER_BY );
         strSqlQuery.append( CONSTANT_ORDER_BY_CREATION_DATE );
 
-        DAOUtil daoUtil = new DAOUtil( strSqlQuery.toString( ), plugin );
-        int nIndex = 1;
-        if ( filter.hasEnvironmentPrefix( ) )
+        try( DAOUtil daoUtil = new DAOUtil( strSqlQuery.toString( ), plugin ) )
         {
-            daoUtil.setString( nIndex++, filter.getEnvironmentPrefix( ) );
-
+	        int nIndex = 1;
+	        if ( filter.hasEnvironmentPrefix( ) )
+	        {
+	            daoUtil.setString( nIndex++, filter.getEnvironmentPrefix( ) );
+	
+	        }
+	        if ( filter.hasApplication( ) )
+	        {
+	            daoUtil.setString( nIndex++, CONSTANT_WILDCARD + filter.getApplication( ) + CONSTANT_WILDCARD );
+	            daoUtil.setString( nIndex++, CONSTANT_WILDCARD + filter.getApplication( ) + CONSTANT_WILDCARD );
+	        }
+	        if ( filter.hasIdDemandType( ) )
+	        {
+	            daoUtil.setString( nIndex++, filter.getIdDemandType( ) );
+	        }
+	
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            Demand demand = getRow( daoUtil );
+	
+	            demandList.add( demand );
+	        }
+	
+	        daoUtil.free( );
         }
-        if ( filter.hasApplication( ) )
-        {
-            daoUtil.setString( nIndex++, CONSTANT_WILDCARD + filter.getApplication( ) + CONSTANT_WILDCARD );
-            daoUtil.setString( nIndex++, CONSTANT_WILDCARD + filter.getApplication( ) + CONSTANT_WILDCARD );
-        }
-        if ( filter.hasIdDemandType( ) )
-        {
-            daoUtil.setString( nIndex++, filter.getIdDemandType( ) );
-        }
-
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
-        {
-            Demand demand = getRow( daoUtil );
-
-            demandList.add( demand );
-        }
-
-        daoUtil.free( );
         return demandList;
     }
 }

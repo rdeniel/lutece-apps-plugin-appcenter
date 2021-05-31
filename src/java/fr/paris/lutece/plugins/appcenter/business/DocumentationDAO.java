@@ -61,8 +61,7 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public void insert( Documentation documentation, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin );
-        try
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
             daoUtil.setInt( nIndex++, documentation.getIdDemandType( ) );
@@ -75,9 +74,7 @@ public final class DocumentationDAO implements IDocumentationDAO
             {
                 documentation.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
-        }
-        finally
-        {
+
             daoUtil.free( );
         }
     }
@@ -88,24 +85,26 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public Documentation load( int nKey, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeQuery( );
-        Documentation documentation = null;
-
-        if ( daoUtil.next( ) )
+    	Documentation documentation = null;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            documentation = new Documentation( );
-            int nIndex = 1;
-
-            documentation.setId( daoUtil.getInt( nIndex++ ) );
-            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
-            documentation.setLabel( daoUtil.getString( nIndex++ ) );
-            documentation.setUrl( daoUtil.getString( nIndex++ ) );
-            documentation.setCategory( daoUtil.getString( nIndex++ ) );
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            documentation = new Documentation( );
+	            int nIndex = 1;
+	
+	            documentation.setId( daoUtil.getInt( nIndex++ ) );
+	            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+	            documentation.setLabel( daoUtil.getString( nIndex++ ) );
+	            documentation.setUrl( daoUtil.getString( nIndex++ ) );
+	            documentation.setCategory( daoUtil.getString( nIndex++ ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return documentation;
     }
 
@@ -115,10 +114,12 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nKey );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+	        daoUtil.setInt( 1, nKey );
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+        }
     }
 
     /**
@@ -127,18 +128,20 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public void store( Documentation documentation, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
-        int nIndex = 1;
-
-        daoUtil.setInt( nIndex++, documentation.getId( ) );
-        daoUtil.setInt( nIndex++, documentation.getIdDemandType( ) );
-        daoUtil.setString( nIndex++, documentation.getLabel( ) );
-        daoUtil.setString( nIndex++, documentation.getUrl( ) );
-        daoUtil.setString( nIndex++, documentation.getCategory( ) );
-        daoUtil.setInt( nIndex, documentation.getId( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        {
+	        int nIndex = 1;
+	
+	        daoUtil.setInt( nIndex++, documentation.getId( ) );
+	        daoUtil.setInt( nIndex++, documentation.getIdDemandType( ) );
+	        daoUtil.setString( nIndex++, documentation.getLabel( ) );
+	        daoUtil.setString( nIndex++, documentation.getUrl( ) );
+	        daoUtil.setString( nIndex++, documentation.getCategory( ) );
+	        daoUtil.setInt( nIndex, documentation.getId( ) );
+	
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+        }
     }
 
     /**
@@ -147,25 +150,27 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public List<Documentation> selectDocumentationsList( Plugin plugin )
     {
-        List<Documentation> documentationList = new ArrayList<Documentation>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Documentation> documentationList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            Documentation documentation = new Documentation( );
-            int nIndex = 1;
-
-            documentation.setId( daoUtil.getInt( nIndex++ ) );
-            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
-            documentation.setLabel( daoUtil.getString( nIndex++ ) );
-            documentation.setUrl( daoUtil.getString( nIndex++ ) );
-            documentation.setCategory( daoUtil.getString( nIndex++ ) );
-
-            documentationList.add( documentation );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            Documentation documentation = new Documentation( );
+	            int nIndex = 1;
+	
+	            documentation.setId( daoUtil.getInt( nIndex++ ) );
+	            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+	            documentation.setLabel( daoUtil.getString( nIndex++ ) );
+	            documentation.setUrl( daoUtil.getString( nIndex++ ) );
+	            documentation.setCategory( daoUtil.getString( nIndex++ ) );
+	
+	            documentationList.add( documentation );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return documentationList;
     }
 
@@ -175,16 +180,18 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public List<Integer> selectIdDocumentationsList( Plugin plugin )
     {
-        List<Integer> documentationList = new ArrayList<Integer>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Integer> documentationList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-            documentationList.add( daoUtil.getInt( 1 ) );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            documentationList.add( daoUtil.getInt( 1 ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return documentationList;
     }
 
@@ -195,15 +202,17 @@ public final class DocumentationDAO implements IDocumentationDAO
     public ReferenceList selectDocumentationsReferenceList( Plugin plugin )
     {
         ReferenceList documentationList = new ReferenceList( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            documentationList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            documentationList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return documentationList;
     }
 
@@ -213,26 +222,28 @@ public final class DocumentationDAO implements IDocumentationDAO
     @Override
     public List<Documentation> selectDocumentationsListByIdDemandType( int nIdDemandType, Plugin plugin )
     {
-        List<Documentation> documentationList = new ArrayList<Documentation>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_DEMAND_TYPE, plugin );
-        daoUtil.setInt( 1, nIdDemandType );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Documentation> documentationList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_DEMAND_TYPE, plugin ) )
         {
-            Documentation documentation = new Documentation( );
-            int nIndex = 1;
-
-            documentation.setId( daoUtil.getInt( nIndex++ ) );
-            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
-            documentation.setLabel( daoUtil.getString( nIndex++ ) );
-            documentation.setUrl( daoUtil.getString( nIndex++ ) );
-            documentation.setCategory( daoUtil.getString( nIndex++ ) );
-
-            documentationList.add( documentation );
+	        daoUtil.setInt( 1, nIdDemandType );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            Documentation documentation = new Documentation( );
+	            int nIndex = 1;
+	
+	            documentation.setId( daoUtil.getInt( nIndex++ ) );
+	            documentation.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+	            documentation.setLabel( daoUtil.getString( nIndex++ ) );
+	            documentation.setUrl( daoUtil.getString( nIndex++ ) );
+	            documentation.setCategory( daoUtil.getString( nIndex++ ) );
+	
+	            documentationList.add( documentation );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return documentationList;
     }
 }

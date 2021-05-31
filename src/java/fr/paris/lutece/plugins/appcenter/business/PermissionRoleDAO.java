@@ -84,25 +84,28 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     @Override
     public PermissionRole load( String strPermissionCode, int strIdRole, String strResourceCode, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setString( 1, strPermissionCode );
-        daoUtil.setInt( 2, strIdRole );
-        daoUtil.setString( 3, strResourceCode );
-
-        daoUtil.executeQuery( );
-        PermissionRole permissionRole = null;
-
-        if ( daoUtil.next( ) )
+    	PermissionRole permissionRole = null;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            permissionRole = new PermissionRole( );
-            int nIndex = 1;
-
-            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
-            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
-            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
+	        daoUtil.setString( 1, strPermissionCode );
+	        daoUtil.setInt( 2, strIdRole );
+	        daoUtil.setString( 3, strResourceCode );
+	
+	        daoUtil.executeQuery( );
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            permissionRole = new PermissionRole( );
+	            int nIndex = 1;
+	
+	            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
+	            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
+	            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
+        
         return permissionRole;
     }
 
@@ -112,14 +115,15 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     @Override
     public void delete( String strPermissionCode, int nIdRole, String strResourceCode, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-
-        daoUtil.setString( 1, strPermissionCode );
-        daoUtil.setInt( 2, nIdRole );
-        daoUtil.setString( 3, strResourceCode );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+	        daoUtil.setString( 1, strPermissionCode );
+	        daoUtil.setInt( 2, nIdRole );
+	        daoUtil.setString( 3, strResourceCode );
+	
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+        }
     }
 
     /**
@@ -129,22 +133,24 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     public List<PermissionRole> selectPermissionRolesList( Plugin plugin )
     {
         List<PermissionRole> permissionRoleList = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            PermissionRole permissionRole = new PermissionRole( );
-            int nIndex = 1;
-
-            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
-            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
-            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
-
-            permissionRoleList.add( permissionRole );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            PermissionRole permissionRole = new PermissionRole( );
+	            int nIndex = 1;
+	
+	            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
+	            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
+	            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
+	
+	            permissionRoleList.add( permissionRole );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return permissionRoleList;
     }
 
@@ -155,15 +161,17 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     public ReferenceList selectPermissionRolesReferenceList( Plugin plugin )
     {
         ReferenceList permissionRoleList = new ReferenceList( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            permissionRoleList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            permissionRoleList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return permissionRoleList;
     }
 
@@ -174,23 +182,25 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     public List<PermissionRole> selectPermissionRolesListByIdRole( int nIdRole, Plugin plugin )
     {
         List<PermissionRole> permissionRoleList = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_CODE, plugin );
-        daoUtil.setInt( 1, nIdRole );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_CODE, plugin ) )
         {
-            PermissionRole permissionRole = new PermissionRole( );
-            int nIndex = 1;
-
-            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
-            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
-            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
-
-            permissionRoleList.add( permissionRole );
+	        daoUtil.setInt( 1, nIdRole );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            PermissionRole permissionRole = new PermissionRole( );
+	            int nIndex = 1;
+	
+	            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
+	            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
+	            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
+	
+	            permissionRoleList.add( permissionRole );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return permissionRoleList;
     }
 
@@ -201,24 +211,26 @@ public final class PermissionRoleDAO implements IPermissionRoleDAO
     public List<PermissionRole> selectPermissionRolesListByCodeAndIdRole( String strPermissionCode, int nIdRole, Plugin plugin )
     {
         List<PermissionRole> permissionRoleList = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_CODE_AND_CODE_PERMISSION, plugin );
-        daoUtil.setInt( 1, nIdRole );
-        daoUtil.setString( 2, strPermissionCode );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_ID_CODE_AND_CODE_PERMISSION, plugin ) )
         {
-            PermissionRole permissionRole = new PermissionRole( );
-            int nIndex = 1;
-
-            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
-            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
-            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
-
-            permissionRoleList.add( permissionRole );
+	        daoUtil.setInt( 1, nIdRole );
+	        daoUtil.setString( 2, strPermissionCode );
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            PermissionRole permissionRole = new PermissionRole( );
+	            int nIndex = 1;
+	
+	            permissionRole.setCodePermission( daoUtil.getString( nIndex++ ) );
+	            permissionRole.setIdRole( daoUtil.getInt( nIndex++ ) );
+	            permissionRole.setCodeResource( daoUtil.getString( nIndex++ ) );
+	
+	            permissionRoleList.add( permissionRole );
+	        }
+	
+	        daoUtil.free( );
         }
-
-        daoUtil.free( );
         return permissionRoleList;
     }
 }

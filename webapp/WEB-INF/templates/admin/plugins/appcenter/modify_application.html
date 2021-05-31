@@ -35,6 +35,16 @@
 				<@formGroup labelKey='#i18n{appcenter.modify_application.labelApplicationData}' helpKey='#i18n{appcenter.modify_application.labelApplicationData.help}' >
 					<@input type='textarea' name='application_data' >${application.applicationData!}</@input>
 				</@formGroup>
+				<img src="${application.logoPath!''}" style="width:200px; height: auto; max-height:300px;" alt="logo" />
+				<@formGroup labelKey='#i18n{appcenter.create_application.labelLogo}' helpKey='' mandatory=false>
+                    <@input type='file' name='logo_path' value='' />
+                </@formGroup>
+                <@formGroup labelKey='#i18n{appcenter.create_application.labelFrontURL}' helpKey='' mandatory=false>
+                    <@input type='text' name='front_URL' value='${application.frontURL!\'\'}' />
+                </@formGroup>
+                <@formGroup labelKey='#i18n{appcenter.create_application.labelBackURL}' helpKey='' mandatory=false>
+                    <@input type='text' name='back_URL' value='${application.backURL!\'\'}' />
+                </@formGroup>
         <@actionButtons button1Name="action_modifyApplication" button2Name="view_manageApplication"/>
     </@tform>
 	</@boxBody>

@@ -44,6 +44,9 @@ name varchar(50) default '' NOT NULL,
 description varchar(255) default '',
 id_organization_manager int default 0,
 application_data long varchar,
+logo_path varchar(255),
+front_url varchar(255),
+back_url varchar(255),
 PRIMARY KEY (id_application)
 );
 

@@ -66,6 +66,12 @@ public class Application implements Serializable
     @NotNull( message = "appcenter.validation.application.OrganizationManager.notNull" )
     private OrganizationManager _organizationManager;
     private String _strApplicationData;
+    private String _strLogoPath;
+    
+    @URL
+    private String _strFrontURL;
+    @URL
+    private String _strBackURL;
 
     private List<UserApplicationRole> _listAuthorizations;
 
@@ -236,5 +242,68 @@ public class Application implements Serializable
     public void setListEnvironment( List<Environment> listEnvironment )
     {
         _listEnvironment = listEnvironment;
+    }
+    
+    /**
+     * Get the front URL
+     * 
+     * @return front URL
+     */
+    public String getFrontURL( )
+    {
+        return this._strFrontURL;
+    }
+    
+    /**
+     * Set the back URL
+     * 
+     * @param String strFrontURL
+     *            the front URL
+     */
+    public void setFrontURL( String strFrontURL)
+    {
+    	this._strFrontURL = strFrontURL;
+    }
+    
+    /**
+     * Get the back URL
+     * 
+     * @return back URL
+     */
+    public String getBackURL( )
+    {
+        return this._strBackURL;
+    }
+    
+    /**
+     * Set the back URL
+     * 
+     * @param String strBackURL
+     *            the back URL
+     */
+    public void setBackURL( String strBackURL)
+    {
+    	this._strBackURL = strBackURL;
+    }
+    
+    /**
+     * get the logo path
+     * 
+     * @return the logo path
+     */
+    public String getLogoPath( )
+    {
+    	return this._strLogoPath;
+    }
+    
+    /**
+     * Set the logo path
+     * 
+     * @param String strLogoPath
+     *            the logo path
+     */
+    public void setLogoPath( String strLogoPath)
+    {
+    	this._strLogoPath = strLogoPath;
     }
 }

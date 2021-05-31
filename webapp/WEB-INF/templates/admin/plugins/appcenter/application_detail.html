@@ -17,6 +17,15 @@
             <@formGroup labelKey='#i18n{appcenter.application_detail.labelApplicationData}' helpKey='' mandatory=false>
                 <pre>${json_data!''}</pre>
             </@formGroup>
+            <@formGroup labelKey='#i18n{appcenter.application_detail.labelLogo}' helpKey='' mandatory=false>
+                ${application.logoPath!''}
+            </@formGroup>
+            <@formGroup labelKey='#i18n{appcenter.application_detail.labelFrontURL}' helpKey='' mandatory=false>
+                ${application.frontURL!''}
+            </@formGroup>
+            <@formGroup labelKey='#i18n{appcenter.application_detail.labelBackURL}' helpKey='' mandatory=false>
+                ${application.backURL!''}
+            </@formGroup>
             <@actionButtons  button1Name="view_manageApplications"/>
     	</@tform>  		
 	</@boxBody>
