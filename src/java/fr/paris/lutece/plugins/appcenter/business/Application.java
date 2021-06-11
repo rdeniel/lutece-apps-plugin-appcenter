@@ -41,6 +41,7 @@ import org.hibernate.validator.constraints.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -68,10 +69,10 @@ public class Application implements Serializable
     private String _strApplicationData;
     private String _strLogoPath;
     
-    @URL
-    private String _strFrontURL;
-    @URL
-    private String _strBackURL;
+    
+    private HashMap<String,String> _FrontURLs;
+
+    private HashMap<String,String> _BackURLs;
 
     private List<UserApplicationRole> _listAuthorizations;
 
@@ -249,9 +250,9 @@ public class Application implements Serializable
      * 
      * @return front URL
      */
-    public String getFrontURL( )
+    public HashMap<String,String> getFrontURL( )
     {
-        return this._strFrontURL;
+        return this._FrontURLs;
     }
     
     /**
@@ -260,9 +261,9 @@ public class Application implements Serializable
      * @param String strFrontURL
      *            the front URL
      */
-    public void setFrontURL( String strFrontURL)
+    public void setFrontURL( HashMap<String,String> FrontURLs)
     {
-    	this._strFrontURL = strFrontURL;
+    	this._FrontURLs = FrontURLs;
     }
     
     /**
@@ -270,9 +271,9 @@ public class Application implements Serializable
      * 
      * @return back URL
      */
-    public String getBackURL( )
+    public HashMap<String,String> getBackURL( )
     {
-        return this._strBackURL;
+        return this._BackURLs;
     }
     
     /**
@@ -281,9 +282,9 @@ public class Application implements Serializable
      * @param String strBackURL
      *            the back URL
      */
-    public void setBackURL( String strBackURL)
+    public void setBackURL( HashMap<String,String> BackURLs)
     {
-    	this._strBackURL = strBackURL;
+    	this._BackURLs = BackURLs;
     }
     
     /**
