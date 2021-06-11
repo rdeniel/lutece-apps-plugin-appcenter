@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.appcenter.business;
 
 import fr.paris.lutece.plugins.appcenter.business.organization.OrganizationManager;
+import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -116,7 +117,7 @@ public final class ApplicationDAO implements IApplicationDAO
 			}
 			daoUtil.setString( nIndex++, application.getApplicationData( ) );
 			daoUtil.setString( nIndex++, application.getCode( ) );
-			daoUtil.setString( nIndex++, application.getLogoPath( ) );
+			daoUtil.setBytes( nIndex++, application.getLogo( ).getValue( ) );
 			daoUtil.setString( nIndex++, application.getFrontURL( ) );
 			daoUtil.setString( nIndex++, application.getBackURL( ) );
 
@@ -144,7 +145,8 @@ public final class ApplicationDAO implements IApplicationDAO
 	 */
 	@Override
 	public Application load( int nKey, Plugin plugin )
-	{
+	{	
+		PhysicalFile physicalFile = new PhysicalFile( );
 		Application application = null;
 		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
 		{
@@ -158,7 +160,6 @@ public final class ApplicationDAO implements IApplicationDAO
 
 				application = new Application( );
 				int nIndex = 1;
-				
 				application.setId( daoUtil.getInt( nIndex++ ) );
 				application.setName( daoUtil.getString( nIndex++ ) );
 				application.setDescription( daoUtil.getString( nIndex++ ) );
@@ -166,7 +167,8 @@ public final class ApplicationDAO implements IApplicationDAO
 				organizationManager.setIdOrganizationManager( daoUtil.getInt( nIndex++ ) );
 				application.setOrganizationManager( organizationManager );
 				application.setApplicationData( daoUtil.getString( nIndex++ ) );
-				application.setLogoPath( daoUtil.getString( nIndex++ ) );
+				physicalFile.setValue( daoUtil.getBytes( nIndex++ ) );
+				application.setLogo( physicalFile );
 				application.setFrontURL( daoUtil.getString( nIndex++ ) );
 				application.setBackURL( daoUtil.getString( nIndex++ ) );
 				application.setCode( daoUtil.getString( nIndex++ ) );
@@ -253,7 +255,7 @@ public final class ApplicationDAO implements IApplicationDAO
 			}
 
 			daoUtil.setString( nIndex++, application.getCode( ) );
-			daoUtil.setString( nIndex++, application.getLogoPath( ) );
+			daoUtil.setBytes( nIndex++, application.getLogo( ).getValue( ) );
 			daoUtil.setString( nIndex++, application.getFrontURL( ) );
 			daoUtil.setString( nIndex++, application.getBackURL( ) );
 
@@ -312,6 +314,7 @@ public final class ApplicationDAO implements IApplicationDAO
 	@Override
 	public List<Application> selectApplicationsList( Plugin plugin )
 	{
+		PhysicalFile physicalFile = new PhysicalFile( );
 		List<Application> applicationList = new ArrayList<>( );
 		try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
 		{
@@ -330,7 +333,8 @@ public final class ApplicationDAO implements IApplicationDAO
 				application.setOrganizationManager( organizationManager );
 				application.setApplicationData( daoUtil.getString( nIndex++ ) );
 				application.setCode( daoUtil.getString( nIndex++ ) );
-				application.setLogoPath( daoUtil.getString( nIndex++ ) );
+				physicalFile.setValue( daoUtil.getBytes( nIndex++ ) );
+				application.setLogo( physicalFile );
 				application.setFrontURL( daoUtil.getString( nIndex++ ) );
 				application.setBackURL( daoUtil.getString( nIndex++ ) );
 

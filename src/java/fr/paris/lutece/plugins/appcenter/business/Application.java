@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.appcenter.business;
 
 import fr.paris.lutece.plugins.appcenter.business.organization.OrganizationManager;
 import fr.paris.lutece.plugins.appcenter.business.resourcetype.ResourceTypeValue;
+import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
 import fr.paris.lutece.plugins.appcenter.business.resourcetype.AbstractAppCenterResourceType;
 import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.*;
@@ -67,8 +68,7 @@ public class Application implements Serializable
     @NotNull( message = "appcenter.validation.application.OrganizationManager.notNull" )
     private OrganizationManager _organizationManager;
     private String _strApplicationData;
-    private String _strLogoPath;
-    
+    private PhysicalFile _Logo;
     
     private HashMap<String,String> _FrontURLs;
 
@@ -288,23 +288,23 @@ public class Application implements Serializable
     }
     
     /**
-     * get the logo path
+     * get the logo
      * 
-     * @return the logo path
+     * @return the logo
      */
-    public String getLogoPath( )
+    public PhysicalFile getLogo( )
     {
-    	return this._strLogoPath;
+    	return this._Logo;
     }
     
     /**
-     * Set the logo path
+     * Set the logo
      * 
-     * @param String strLogoPath
-     *            the logo path
+     * @param PhysicalFile Logo
+     *            the logo
      */
-    public void setLogoPath( String strLogoPath)
+    public void setLogo( PhysicalFile Logo )
     {
-    	this._strLogoPath = strLogoPath;
+    	this._Logo = Logo;
     }
 }

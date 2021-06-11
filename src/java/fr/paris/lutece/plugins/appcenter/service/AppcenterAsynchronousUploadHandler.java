@@ -55,8 +55,8 @@ import org.apache.commons.lang.StringUtils;
 
 public class AppcenterAsynchronousUploadHandler extends AbstractAsynchronousUploadHandler {
 
-    private static final String HANDLER_NAME = "lutecetoolsAsynchronousUploadHandler";
-    public static final String BEAN_NAME = "lutecetools.AppcenterAsynchronousUploadHandler";
+    private static final String HANDLER_NAME = "appcenterAsynchronousUploadHandler";
+    public static final String BEAN_NAME = "appcenterAsynchronousUploadHandler";
 
     private static final String ERROR_MESSAGE_UNKNOWN_ERROR = "lutecetools.message.unknownError";
 
